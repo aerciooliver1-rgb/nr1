@@ -33,6 +33,22 @@ function toast(msg, type = 'success') {
     setTimeout(() => el.remove(), 3000);
 }
 
+function setLoading(btn, loading) {
+    if (loading) {
+        btn.dataset.origText = btn.textContent;
+        btn.textContent = 'Aguarde...';
+        btn.disabled = true;
+    } else {
+        btn.textContent = btn.dataset.origText || btn.textContent;
+        btn.disabled = false;
+    }
+}
+
+function formatCNPJ(v) {
+    return v.replace(/\D/g, '').replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d)/, '$1-$2').substring(0, 18);
+}
+
 // ══ Auth ══
 function showSignup() {
     document.getElementById('login-form').classList.add('hidden');
@@ -47,7 +63,9 @@ async function doLogin() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     const errEl = document.getElementById('login-error');
+    const btn = document.querySelector('#login-form .btn-primary');
     errEl.classList.add('hidden');
+    setLoading(btn, true);
     try {
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -56,7 +74,7 @@ async function doLogin() {
     } catch (e) {
         errEl.textContent = e.message || 'E-mail ou senha incorretos';
         errEl.classList.remove('hidden');
-    }
+    } finally { setLoading(btn, false); }
 }
 
 async function doSignup() {
@@ -119,6 +137,7 @@ function navigate(screen) {
         intervencoes: loadIntervencoes, catalogo: loadCatalogo, 'plano-acao': loadPlanoAcao,
         apresentacao: loadApresentacao, aprovacao: loadAprovacao, acompanhamento: loadAcompanhamento,
         avaliacoes: loadAvaliacoes, relatorios: loadRelatorios, reavaliacao: loadReavaliacao,
+        configuracoes: loadConfiguracoes,
     };
     if (loaders[screen]) loaders[screen]();
 }
@@ -181,6 +200,8 @@ async function saveCompany() {
         observacoes: document.getElementById('empresa-obs').value || null,
     };
     if (!d.name) { toast('Nome é obrigatório', 'error'); return; }
+    const btn = document.querySelector('#screen-empresa-form .btn-primary');
+    setLoading(btn, true);
     try {
         if (id) {
             await sb.from('companies').update(d).eq('id', id);
@@ -195,7 +216,7 @@ async function saveCompany() {
         }
         document.getElementById('empresa-id').value = '';
         navigate('empresa-perfil');
-    } catch (e) { toast(e.message, 'error'); }
+    } catch (e) { toast(e.message, 'error'); } finally { setLoading(btn, false); }
 }
 
 async function loadEmpresas() {
@@ -304,6 +325,8 @@ async function createAssessment() {
     const sector_id = document.getElementById('av-setor').value;
     const mode = document.querySelector('input[name="av-mode"]:checked').value;
     if (!company_id || !sector_id) { toast('Selecione empresa e setor', 'error'); return; }
+    const btn = document.querySelector('#screen-avaliacao-inicio .btn-primary');
+    setLoading(btn, true);
 
     const { data: existing } = await sb.from('assessments').select('cycle_number').eq('company_id', company_id).eq('sector_id', sector_id).order('cycle_number', { ascending: false }).limit(1);
     const cycle = existing?.length ? existing[0].cycle_number + 1 : 1;
@@ -328,9 +351,11 @@ async function createAssessment() {
         const link = `/survey/${data.id}/${sector_id}/${token_convite}`;
         await sb.from('assessments').update({ link_survey: link }).eq('id', data.id);
         alert(`Link do survey anônimo:\n${window.location.origin}${link}\n\nCompartilhe com os trabalhadores do setor.`);
+        setLoading(btn, false);
         navigate('empresa-perfil');
     } else {
         toast('Avaliação criada!');
+        setLoading(btn, false);
         navigate('questionario');
     }
 }
@@ -733,7 +758,35 @@ async function loadApresentacao() {
 }
 
 // ══ T-15: Approval ══
-function loadAprovacao() {}
+async function loadAprovacao() {
+    if (!currentActionPlanId && currentAssessmentId) {
+        const { data: plans } = await sb.from('action_plans').select('*').eq('assessment_id', currentAssessmentId);
+        if (plans?.[0]) currentActionPlanId = plans[0].id;
+    }
+    if (!currentActionPlanId) {
+        document.getElementById('approval-status-display').innerHTML = '<div class="alert alert-warning">Nenhum plano de ação encontrado. Crie um plano antes de submeter para aprovação.</div>';
+        return;
+    }
+    const { data: plan } = await sb.from('action_plans').select('*').eq('id', currentActionPlanId).single();
+    if (!plan) return;
+
+    const { count } = await sb.from('action_items').select('id', { count: 'exact', head: true }).eq('action_plan_id', plan.id);
+
+    document.getElementById('approval-status-display').innerHTML = `
+        <div class="alert alert-info" style="margin-bottom:16px">
+            <strong>Plano com ${count||0} ações</strong> — Status atual: <span class="badge badge-${plan.approval_status}">${fmtApproval(plan.approval_status)}</span>
+            ${plan.approved_at ? `<br><small>Última atualização: ${fmtDate(plan.approved_at)} por ${plan.approver_name||'—'} (${plan.approver_role||'—'})</small>` : ''}
+        </div>`;
+
+    if (plan.approval_status && plan.approval_status !== 'pendente') {
+        const radio = document.querySelector(`input[name="approval-status"][value="${plan.approval_status}"]`);
+        if (radio) radio.checked = true;
+    }
+    document.getElementById('approval-notes').value = plan.approval_notes || '';
+    document.getElementById('approval-name').value = plan.approver_name || '';
+    document.getElementById('approval-role').value = plan.approver_role || '';
+}
+
 function goToApproval() { navigate('aprovacao'); }
 
 async function submitApproval() {
@@ -799,11 +852,93 @@ async function updItemStatusDirect(id, s) {
 }
 
 // ══ T-18: Re-evaluation ══
-function loadReavaliacao() {
-    document.getElementById('reavaliacao-content').innerHTML = `<div class="card"><div class="card-body"><div class="empty-state">
-        <div class="icon">🔄</div><h3>Reavaliação</h3>
-        <p>Para reavaliar, acesse o perfil da empresa e inicie uma nova avaliação para o setor desejado.</p>
-        <button class="btn btn-primary" onclick="navigate('empresas')">Ver Empresas</button></div></div></div>`;
+async function loadReavaliacao() {
+    const { data: companies } = await sb.from('companies').select('id, name').order('name');
+    let html = `<div class="card"><div class="card-body">
+        <div class="form-row">
+            <div class="form-group"><label>Empresa</label>
+                <select id="reav-empresa" onchange="loadReavSectors()"><option value="">Selecione...</option>
+                ${(companies||[]).map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Setor</label><select id="reav-setor" onchange="loadReavComparativo()"><option value="">Selecione...</option></select></div>
+        </div></div></div>
+        <div id="reav-resultado"></div>`;
+    document.getElementById('reavaliacao-content').innerHTML = html;
+}
+
+async function loadReavSectors() {
+    const cid = document.getElementById('reav-empresa').value;
+    if (!cid) return;
+    const { data } = await sb.from('sectors').select('id, name').eq('company_id', cid);
+    document.getElementById('reav-setor').innerHTML = '<option value="">Selecione...</option>' + (data||[]).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    document.getElementById('reav-resultado').innerHTML = '';
+}
+
+async function loadReavComparativo() {
+    const cid = document.getElementById('reav-empresa').value;
+    const sid = document.getElementById('reav-setor').value;
+    if (!cid || !sid) return;
+
+    const { data: assessments } = await sb.from('assessments')
+        .select('id, cycle_number, completed_at, indice_risco_geral, nivel_risco_geral')
+        .eq('company_id', cid).eq('sector_id', sid).eq('status', 'completed')
+        .order('cycle_number');
+
+    if (!assessments?.length) {
+        document.getElementById('reav-resultado').innerHTML = '<div class="card"><div class="card-body"><div class="empty-state"><div class="icon">📋</div><h3>Nenhuma avaliação concluída para este setor</h3><p>Inicie uma avaliação para gerar resultados comparáveis.</p><button class="btn btn-primary" onclick="navigate(\'avaliacao-inicio\')">+ Nova Avaliação</button></div></div></div>';
+        return;
+    }
+
+    if (assessments.length < 2) {
+        document.getElementById('reav-resultado').innerHTML = `<div class="card"><div class="card-body">
+            <div class="alert alert-info">Apenas 1 ciclo concluído (Score: ${Math.round(assessments[0].indice_risco_geral||0)} — ${assessments[0].nivel_risco_geral}). É necessário ao menos 2 ciclos para comparar.</div>
+            <button class="btn btn-primary" onclick="navigate('avaliacao-inicio')">Iniciar Novo Ciclo</button></div></div>`;
+        return;
+    }
+
+    const allScores = [];
+    for (const a of assessments) {
+        const { data: risks } = await sb.from('risk_scores').select('*, factors(name, code)').eq('assessment_id', a.id).order('factor_id');
+        allScores.push({ assessment: a, risks: risks || [] });
+    }
+
+    const factorCodes = [...new Set(allScores.flatMap(s => s.risks.map(r => r.factors?.code)))].sort();
+
+    let tableHtml = `<table><thead><tr><th>Fator</th>${assessments.map(a => `<th>Ciclo ${a.cycle_number}<br><small>${fmtDate(a.completed_at)}</small></th>`).join('')}<th>Tendência</th></tr></thead><tbody>`;
+
+    for (const code of factorCodes) {
+        tableHtml += `<tr><td><strong>${code}</strong></td>`;
+        let prev = null, trend = '';
+        for (const s of allScores) {
+            const r = s.risks.find(r => r.factors?.code === code);
+            const sc = r ? Math.round(r.final_score) : '-';
+            const cls = r?.classification || '';
+            tableHtml += `<td><span class="badge badge-${cls}">${sc}</span></td>`;
+            if (r && prev !== null) {
+                const diff = Math.round(r.final_score) - prev;
+                trend = diff > 0 ? `<span style="color:var(--risk-alto)">▲ +${diff}</span>` : diff < 0 ? `<span style="color:var(--primary)">▼ ${diff}</span>` : '<span style="color:var(--text-light)">—</span>';
+            }
+            if (r) prev = Math.round(r.final_score);
+        }
+        tableHtml += `<td>${trend}</td></tr>`;
+    }
+
+    const last = assessments[assessments.length - 1];
+    const penult = assessments[assessments.length - 2];
+    const diff = Math.round((last.indice_risco_geral||0) - (penult.indice_risco_geral||0));
+    const trendIcon = diff > 0 ? '▲' : diff < 0 ? '▼' : '—';
+    const trendColor = diff > 0 ? 'var(--risk-alto)' : diff < 0 ? 'var(--primary)' : 'var(--text-light)';
+
+    tableHtml += `<tr style="font-weight:600;background:#F5F7FA"><td>GERAL</td>${assessments.map(a => `<td><span class="badge badge-${a.nivel_risco_geral}">${Math.round(a.indice_risco_geral||0)}</span></td>`).join('')}<td><span style="color:${trendColor}">${trendIcon} ${diff > 0 ? '+' : ''}${diff}</span></td></tr>`;
+    tableHtml += '</tbody></table>';
+
+    document.getElementById('reav-resultado').innerHTML = `
+        <div class="card" style="margin-top:16px"><div class="card-header"><h2>Comparativo de Ciclos</h2>
+            <span style="font-size:13px;color:${trendColor}">${trendIcon} ${diff > 0 ? 'Risco aumentou' : diff < 0 ? 'Risco reduziu' : 'Sem alteração'} (${diff > 0 ? '+' : ''}${diff} pontos)</span></div>
+            <div class="card-body table-container">${tableHtml}</div></div>
+        <div class="btn-group" style="margin-top:16px">
+            <button class="btn btn-primary" onclick="navigate('avaliacao-inicio')">Iniciar Novo Ciclo</button>
+            <button class="btn btn-secondary" onclick="navigate('relatorios')">Gerar Relatório</button>
+        </div>`;
 }
 
 // ══ T-19: Reports ══
@@ -867,7 +1002,25 @@ async function loadAvaliacoes() {
         </tr>`).join('')}</tbody></table>`;
 }
 
-function saveConfig() { toast('Configurações salvas!'); }
+async function saveConfig() {
+    const name = document.getElementById('config-name').value;
+    const crp = document.getElementById('config-crp').value;
+    try {
+        const { error } = await sb.from('profiles').upsert({
+            id: currentUser.id, full_name: name || null, crp: crp || null
+        });
+        if (error) throw error;
+        toast('Configurações salvas!');
+    } catch (e) { toast(e.message, 'error'); }
+}
+
+async function loadConfiguracoes() {
+    const { data } = await sb.from('profiles').select('full_name, crp').eq('id', currentUser.id).single();
+    if (data) {
+        document.getElementById('config-name').value = data.full_name || '';
+        document.getElementById('config-crp').value = data.crp || '';
+    }
+}
 
 // ══ Helpers ══
 function fmtDate(d) { return d ? new Date(d).toLocaleDateString('pt-BR') : '-'; }
@@ -881,6 +1034,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    }
     if (e.key === 'Enter') {
         const ls = document.getElementById('screen-login');
         if (ls.classList.contains('active') || ls.style.display !== 'none') {

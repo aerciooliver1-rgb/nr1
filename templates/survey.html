@@ -209,6 +209,8 @@
     }
 
     async function submitSurvey() {
+        const btn = document.querySelector('#survey-confirm .btn-primary');
+        btn.disabled = true; btn.textContent = 'Enviando...';
         try {
             const { error: sessaoErr } = await sb
                 .from('sessao_anonima')
@@ -248,6 +250,7 @@
             sessionStorage.clear();
         } catch (e) {
             alert('Erro ao enviar: ' + e.message);
+            btn.disabled = false; btn.textContent = 'Enviar respostas';
         }
     }
 
