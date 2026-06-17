@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRPS NR-1 — Diagnóstico de Riscos Psicossociais</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -31,7 +34,7 @@
                 <div id="login-error" class="alert alert-danger hidden"></div>
                 <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">Entrar</button>
                 <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-light)">
-                    Não tem conta? <a href="#" onclick="showSignup()" style="color:var(--primary)">Cadastre-se</a>
+                    Não tem conta? <a href="#" onclick="showSignup()" style="color:var(--primary);font-weight:600">Cadastre-se</a>
                 </p>
             </div>
             <div id="signup-form" class="hidden">
@@ -50,7 +53,7 @@
                 <div id="signup-error" class="alert alert-danger hidden"></div>
                 <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doSignup()">Criar conta</button>
                 <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-light)">
-                    Já tem conta? <a href="#" onclick="showLogin()" style="color:var(--primary)">Faça login</a>
+                    Já tem conta? <a href="#" onclick="showLogin()" style="color:var(--primary);font-weight:600">Faça login</a>
                 </p>
             </div>
         </div>
@@ -67,18 +70,34 @@
         </div>
         <nav class="sidebar-nav">
             <div class="sidebar-section">Principal</div>
-            <a onclick="navigate('dashboard')" data-screen="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
-            <a onclick="navigate('empresas')" data-screen="empresas"><span class="nav-icon">🏢</span> Empresas</a>
+            <a onclick="navigate('dashboard')" data-screen="dashboard">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg></span> Dashboard
+            </a>
+            <a onclick="navigate('empresas')" data-screen="empresas">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="3" y="2" width="14" height="16" rx="1.5"/><rect x="8" y="13" width="4" height="5"/><line x1="7" y1="6" x2="7" y2="6.01" stroke-width="2" stroke-linecap="round"/><line x1="13" y1="6" x2="13" y2="6.01" stroke-width="2" stroke-linecap="round"/><line x1="7" y1="10" x2="7" y2="10.01" stroke-width="2" stroke-linecap="round"/><line x1="13" y1="10" x2="13" y2="10.01" stroke-width="2" stroke-linecap="round"/></svg></span> Empresas
+            </a>
 
             <div class="sidebar-section">Diagnóstico</div>
-            <a onclick="navigate('avaliacoes')" data-screen="avaliacoes"><span class="nav-icon">📋</span> Avaliações</a>
-            <a onclick="navigate('catalogo')" data-screen="catalogo"><span class="nav-icon">📚</span> Catálogo de Programas</a>
+            <a onclick="navigate('avaliacoes')" data-screen="avaliacoes">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="12" height="15" rx="2"/><path d="M7 2h6v2a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V2z"/><line x1="7.5" y1="9" x2="12.5" y2="9"/><line x1="7.5" y1="12" x2="12.5" y2="12"/></svg></span> Avaliações
+            </a>
+            <a onclick="navigate('catalogo')" data-screen="catalogo">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 16V4a2 2 0 0 1 2-2h4l1 1v14H5a2 2 0 0 1-2-2z"/><path d="M17 16V4a2 2 0 0 0-2-2h-4l-1 1v14h5a2 2 0 0 0 2-2z"/></svg></span> Catálogo de Programas
+            </a>
 
             <div class="sidebar-section">Gestão</div>
-            <a onclick="navigate('acompanhamento')" data-screen="acompanhamento"><span class="nav-icon">✅</span> Acompanhamento</a>
-            <a onclick="navigate('reavaliacao')" data-screen="reavaliacao"><span class="nav-icon">🔄</span> Reavaliação</a>
-            <a onclick="navigate('relatorios')" data-screen="relatorios"><span class="nav-icon">📄</span> Relatórios</a>
-            <a onclick="navigate('configuracoes')" data-screen="configuracoes"><span class="nav-icon">⚙️</span> Configurações</a>
+            <a onclick="navigate('acompanhamento')" data-screen="acompanhamento">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><path d="M7 10l2 2.5 4-5"/></svg></span> Acompanhamento
+            </a>
+            <a onclick="navigate('reavaliacao')" data-screen="reavaliacao">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v5h-5"/><path d="M4 16v-5h5"/><path d="M5.5 7.5A6.5 6.5 0 0 1 16 9"/><path d="M14.5 12.5A6.5 6.5 0 0 1 4 11"/></svg></span> Reavaliação
+            </a>
+            <a onclick="navigate('relatorios')" data-screen="relatorios">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H5.5A1.5 1.5 0 0 0 4 3.5v13A1.5 1.5 0 0 0 5.5 18h9a1.5 1.5 0 0 0 1.5-1.5V7l-4-5z"/><path d="M12 2v5h4"/><line x1="7" y1="10" x2="13" y2="10"/><line x1="7" y1="13" x2="11" y2="13"/></svg></span> Relatórios
+            </a>
+            <a onclick="navigate('configuracoes')" data-screen="configuracoes">
+                <span class="nav-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="3"/><path d="M10 2v2.5m0 11v2.5M2 10h2.5m11 0H18M4.4 4.4l1.8 1.8m7.6 7.6l1.8 1.8M4.4 15.6l1.8-1.8m7.6-7.6l1.8-1.8"/></svg></span> Configurações
+            </a>
         </nav>
         <div class="sidebar-user">
             <div class="user-email" id="user-email"></div>
@@ -252,8 +271,8 @@
                     <div class="form-group">
                         <label>Modo de Avaliação *</label>
                         <div class="toggle-group">
-                            <label><input type="radio" name="av-mode" value="institucional" checked onchange="toggleMode()"><span>Modo A — Institucional (Psicóloga)</span></label>
-                            <label><input type="radio" name="av-mode" value="anonimo" onchange="toggleMode()"><span>Modo B — Survey Anônimo (Trabalhadores)</span></label>
+                            <label><input type="radio" name="av-mode" value="institucional" checked onchange="toggleMode()"><span>Modo A — Institucional</span></label>
+                            <label><input type="radio" name="av-mode" value="anonimo" onchange="toggleMode()"><span>Modo B — Survey Anônimo</span></label>
                         </div>
                     </div>
                     <div id="modo-a-fields">
@@ -277,10 +296,10 @@
                             <input type="number" id="av-minimo" value="5" min="3">
                         </div>
                     </div>
-                    <div class="card" style="margin-top:16px;background:#F8F9FA">
+                    <div class="card" style="margin-top:16px;background:var(--bg-warm);border:1px solid var(--border-light)">
                         <div class="card-body">
-                            <h3 style="font-size:15px;margin-bottom:8px">O que será avaliado</h3>
-                            <p style="font-size:13px;color:var(--text-light);line-height:1.6">
+                            <h3 style="font-family:'Fraunces',serif;font-size:15px;margin-bottom:8px;font-weight:600">O que será avaliado</h3>
+                            <p style="font-size:13px;color:var(--text-light);line-height:1.7">
                                 O instrumento avalia <strong>13 fatores de risco psicossocial</strong> conforme o Guia MTE 2025 e a NR-1.
                                 São avaliadas dimensões como: assédio, gestão de mudanças, clareza de papel, reconhecimento,
                                 suporte, autonomia, justiça organizacional, violência, demandas de trabalho, relações interpessoais,
@@ -303,7 +322,7 @@
                     <h1>Questionário NR-1</h1>
                     <div class="breadcrumb" id="quest-breadcrumb">Diagnóstico > Questionário</div>
                 </div>
-                <div id="quest-progress-text" style="font-size:14px;color:var(--text-light)"></div>
+                <div id="quest-progress-text" style="font-size:13px;color:var(--text-light);font-weight:500"></div>
             </div>
             <div class="stepper" id="quest-stepper"></div>
             <div class="progress-bar mb-16"><div class="fill green" id="quest-progress-bar" style="width:0%"></div></div>
@@ -313,7 +332,7 @@
                     <span class="badge" id="quest-factor-code"></span>
                 </div>
                 <div class="card-body" id="quest-questions"></div>
-                <div class="card-body" style="border-top:1px solid var(--border)">
+                <div class="card-body" style="border-top:1px solid var(--border-light)">
                     <div class="form-group">
                         <label>Observação clínica (opcional)</label>
                         <textarea id="quest-observation" placeholder="Anotações sobre este fator..."></textarea>
@@ -421,10 +440,10 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-body text-center" style="padding:40px">
-                    <div style="font-size:48px;margin-bottom:16px">📊</div>
-                    <h3>Prévia da Apresentação</h3>
-                    <p style="color:var(--text-light);margin:16px 0">A apresentação será gerada com: capa, diagnóstico, riscos identificados, programas de intervenção e plano de ação.</p>
+                <div class="card-body text-center" style="padding:48px">
+                    <div style="font-size:48px;margin-bottom:16px;opacity:0.5">📊</div>
+                    <h3 style="font-family:'Fraunces',serif;font-weight:600">Prévia da Apresentação</h3>
+                    <p style="color:var(--text-light);margin:16px 0;font-size:13.5px">A apresentação será gerada com: capa, diagnóstico, riscos identificados, programas de intervenção e plano de ação.</p>
                     <div id="presentation-preview"></div>
                 </div>
             </div>
@@ -536,7 +555,7 @@
             <div class="card">
                 <div class="card-header"><h2>Sobre o Sistema</h2></div>
                 <div class="card-body">
-                    <p style="font-size:13px;color:var(--text-light);line-height:1.6">
+                    <p style="font-size:13px;color:var(--text-light);line-height:1.7">
                         <strong>Sistema de Diagnóstico de Riscos Psicossociais — NR-1</strong><br>
                         Versão 2.0 — Conforme Portaria MTE nº 1.419/2024 e Guia MTE 2025<br>
                         Instrumento: 13 fatores de risco × 50 questões<br>

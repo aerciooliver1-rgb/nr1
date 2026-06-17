@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pesquisa de Riscos Psicossociais — Anônima</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -17,18 +20,18 @@
         <!-- Consent -->
         <div id="survey-consent">
             <div class="card">
-                <div class="card-body text-center" style="padding:32px">
-                    <h2 style="margin-bottom:16px;color:var(--primary-dark)">Termo de Anonimato</h2>
+                <div class="card-body text-center" style="padding:40px">
+                    <h2 style="margin-bottom:16px;color:var(--primary-dark);font-family:'Fraunces',serif;font-weight:600">Termo de Anonimato</h2>
                     <div class="anonymity-banner" style="text-align:left">
                         <strong style="display:block;text-align:center">Suas respostas são totalmente anônimas</strong>
-                        <p style="margin-top:12px;line-height:1.6">
+                        <p style="margin-top:12px;line-height:1.7">
                             O sistema <strong>não coleta seu nome, e-mail ou qualquer dado pessoal</strong>.
                             Somente as médias do setor serão analisadas. Nenhuma resposta individual será
                             identificada ou compartilhada. Sua participação é voluntária e confidencial.
                         </p>
                     </div>
                     <div id="survey-info" style="margin:16px 0;font-size:14px;color:var(--text-light)"></div>
-                    <button class="btn btn-primary" style="font-size:16px;padding:14px 32px" onclick="acceptConsent()">
+                    <button class="btn btn-primary" style="font-size:15px;padding:14px 36px" onclick="acceptConsent()">
                         Entendi e quero responder
                     </button>
                 </div>
@@ -54,10 +57,10 @@
         <!-- Confirmation -->
         <div id="survey-confirm" class="hidden">
             <div class="card">
-                <div class="card-body text-center" style="padding:32px">
-                    <h2>Confirmar envio</h2>
+                <div class="card-body text-center" style="padding:40px">
+                    <h2 style="font-family:'Fraunces',serif;font-weight:600">Confirmar envio</h2>
                     <p style="color:var(--text-light);margin:16px 0">Suas respostas serão enviadas sem identificação. Após o envio, não será possível alterar as respostas.</p>
-                    <button class="btn btn-primary" style="font-size:16px;padding:14px 32px" onclick="submitSurvey()">Enviar respostas</button>
+                    <button class="btn btn-primary" style="font-size:15px;padding:14px 36px" onclick="submitSurvey()">Enviar respostas</button>
                     <br>
                     <button class="btn btn-secondary mt-16" onclick="surveyBackToQuestions()">Revisar respostas</button>
                 </div>
@@ -67,11 +70,11 @@
         <!-- Done -->
         <div id="survey-done" class="hidden">
             <div class="card">
-                <div class="card-body text-center" style="padding:48px">
-                    <div style="font-size:64px;margin-bottom:16px">✅</div>
-                    <h2 style="color:var(--primary-dark)">Obrigado pela participação!</h2>
+                <div class="card-body text-center" style="padding:56px 40px">
+                    <div style="font-size:56px;margin-bottom:16px;opacity:0.8">✅</div>
+                    <h2 style="color:var(--primary-dark);font-family:'Fraunces',serif;font-weight:600">Obrigado pela participação!</h2>
                     <p style="color:var(--text-light);margin-top:12px">Suas respostas foram enviadas com sucesso de forma anônima.</p>
-                    <p style="color:var(--text-light);font-size:13px;margin-top:8px">Você pode fechar esta página.</p>
+                    <p style="color:var(--text-muted);font-size:13px;margin-top:8px">Você pode fechar esta página.</p>
                 </div>
             </div>
         </div>
@@ -108,8 +111,8 @@
 
             if (error || !assessment) {
                 document.getElementById('survey-consent').innerHTML = `
-                    <div class="card"><div class="card-body text-center" style="padding:32px">
-                        <h2 style="color:var(--risk-alto)">Pesquisa indisponível</h2>
+                    <div class="card"><div class="card-body text-center" style="padding:40px">
+                        <h2 style="color:var(--risk-alto);font-family:'Fraunces',serif;font-weight:600">Pesquisa indisponível</h2>
                         <p style="color:var(--text-light);margin-top:12px">Esta pesquisa não foi encontrada ou não está mais disponível.</p>
                     </div></div>`;
                 return;
@@ -117,8 +120,8 @@
 
             if (assessment.status !== 'coletando') {
                 document.getElementById('survey-consent').innerHTML = `
-                    <div class="card"><div class="card-body text-center" style="padding:32px">
-                        <h2 style="color:var(--risk-alto)">Pesquisa indisponível</h2>
+                    <div class="card"><div class="card-body text-center" style="padding:40px">
+                        <h2 style="color:var(--risk-alto);font-family:'Fraunces',serif;font-weight:600">Pesquisa indisponível</h2>
                         <p style="color:var(--text-light);margin-top:12px">Esta pesquisa não está recebendo respostas no momento.</p>
                     </div></div>`;
                 return;
