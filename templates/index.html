@@ -6,7 +6,7 @@
     <title>DRPS NR-1 — Diagnóstico de Riscos Psicossociais</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -16,45 +16,87 @@
 <!-- ══ T-01: LOGIN ══ -->
 <div id="screen-login" class="screen active">
     <div class="login-container">
-        <div class="login-card">
-            <div class="logo">
-                <h1>Diagnóstico de Riscos Psicossociais</h1>
-                <p>Saúde Mental nas Empresas</p>
-                <span class="badge">NR-1 · Portaria MTE nº 1.419/2024</span>
+        <div class="login-left">
+            <div class="login-brand">
+                <div class="login-brand-icon">⚡</div>
+                <div class="login-brand-text">
+                    <h3>DRPS NR-1</h3>
+                    <span>RISCOS PSICOSSOCIAIS</span>
+                </div>
             </div>
-            <div id="login-form">
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="login-email" placeholder="seu@email.com">
+            <div class="login-hero">
+                <div class="eyebrow">Diagnóstico de Riscos Psicossociais</div>
+                <h1 class="hero-heading">Conformidade NR-1 <span class="text-accent">com precisão clínica.</span></h1>
+                <p class="hero-desc">Plataforma completa para avaliação, diagnóstico e gestão de riscos psicossociais conforme NR-1 e Portaria MTE nº 1.419/2024.</p>
+                <div class="login-stats">
+                    <div><div class="login-stat-value">13</div><div class="login-stat-label">Fatores</div></div>
+                    <div><div class="login-stat-value">55</div><div class="login-stat-label">Questões</div></div>
+                    <div><div class="login-stat-value">LGPD</div><div class="login-stat-label">Conforme</div></div>
                 </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="login-password" placeholder="Sua senha">
-                </div>
-                <div id="login-error" class="alert alert-danger hidden"></div>
-                <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">Entrar</button>
-                <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-light)">
-                    Não tem conta? <a href="#" onclick="showSignup()" style="color:var(--primary);font-weight:600">Cadastre-se</a>
-                </p>
             </div>
-            <div id="signup-form" class="hidden">
-                <div class="form-group">
-                    <label>Nome completo</label>
-                    <input type="text" id="signup-name" placeholder="Seu nome">
+            <div class="login-footer">NR-1 · Portaria MTE nº 1.419/2024 · Guia MTE 2025</div>
+        </div>
+        <div class="login-right">
+            <div class="login-card">
+                <div class="logo">
+                    <h1>DRPS NR-1</h1>
+                    <p>Riscos Psicossociais</p>
+                    <span class="badge">NR-1 · Portaria MTE nº 1.419/2024</span>
                 </div>
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="signup-email" placeholder="seu@email.com">
+                <div id="login-form">
+                    <h2 class="login-card-title">Entrar</h2>
+                    <p class="login-card-subtitle">Acesse sua conta para continuar</p>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="login-email" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="login-password" placeholder="Sua senha">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <a href="#" class="forgot-link" onclick="event.preventDefault()">Esqueceu a senha?</a>
+                    <div id="login-error" class="alert alert-danger hidden"></div>
+                    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">Entrar</button>
+                    <div class="toggle-link">
+                        Não tem conta? <a href="#" onclick="showSignup()">Cadastre-se</a>
+                    </div>
+                    <div class="lgpd-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Seus dados estão protegidos conforme a LGPD
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="signup-password" placeholder="Mínimo 6 caracteres">
+                <div id="signup-form" class="hidden">
+                    <h2 class="login-card-title">Criar conta</h2>
+                    <p class="login-card-subtitle">Cadastre-se para começar</p>
+                    <div class="form-group">
+                        <label>Nome completo</label>
+                        <input type="text" id="signup-name" placeholder="Seu nome">
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="signup-email" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="signup-password" placeholder="Mínimo 6 caracteres">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="signup-error" class="alert alert-danger hidden"></div>
+                    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doSignup()">Criar conta</button>
+                    <div class="toggle-link">
+                        Já tem conta? <a href="#" onclick="showLogin()">Faça login</a>
+                    </div>
                 </div>
-                <div id="signup-error" class="alert alert-danger hidden"></div>
-                <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doSignup()">Criar conta</button>
-                <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-light)">
-                    Já tem conta? <a href="#" onclick="showLogin()" style="color:var(--primary);font-weight:600">Faça login</a>
-                </p>
+                <div class="login-version">v2.0 — NR-1 Compliance</div>
             </div>
         </div>
     </div>
@@ -296,10 +338,10 @@
                             <input type="number" id="av-minimo" value="5" min="3">
                         </div>
                     </div>
-                    <div class="card" style="margin-top:16px;background:var(--bg-warm);border:1px solid var(--border-light)">
+                    <div class="card" style="margin-top:16px;background:var(--bg-surface);border:1px solid var(--border)">
                         <div class="card-body">
-                            <h3 style="font-family:'Fraunces',serif;font-size:15px;margin-bottom:8px;font-weight:600">O que será avaliado</h3>
-                            <p style="font-size:13px;color:var(--text-light);line-height:1.7">
+                            <h3 style="font-size:15px;margin-bottom:8px;font-weight:600">O que será avaliado</h3>
+                            <p style="font-size:13px;color:var(--text-secondary);line-height:1.7">
                                 O instrumento avalia <strong>13 fatores de risco psicossocial</strong> conforme o Guia MTE 2025 e a NR-1.
                                 São avaliadas dimensões como: assédio, gestão de mudanças, clareza de papel, reconhecimento,
                                 suporte, autonomia, justiça organizacional, violência, demandas de trabalho, relações interpessoais,
@@ -322,7 +364,7 @@
                     <h1>Questionário NR-1</h1>
                     <div class="breadcrumb" id="quest-breadcrumb">Diagnóstico > Questionário</div>
                 </div>
-                <div id="quest-progress-text" style="font-size:13px;color:var(--text-light);font-weight:500"></div>
+                <div id="quest-progress-text" style="font-size:13px;color:var(--text-secondary);font-weight:500"></div>
             </div>
             <div class="stepper" id="quest-stepper"></div>
             <div class="progress-bar mb-16"><div class="fill green" id="quest-progress-bar" style="width:0%"></div></div>
@@ -332,7 +374,7 @@
                     <span class="badge" id="quest-factor-code"></span>
                 </div>
                 <div class="card-body" id="quest-questions"></div>
-                <div class="card-body" style="border-top:1px solid var(--border-light)">
+                <div class="card-body" style="border-top:1px solid var(--border)">
                     <div class="form-group">
                         <label>Observação clínica (opcional)</label>
                         <textarea id="quest-observation" placeholder="Anotações sobre este fator..."></textarea>
@@ -442,8 +484,8 @@
             <div class="card">
                 <div class="card-body text-center" style="padding:48px">
                     <div style="font-size:48px;margin-bottom:16px;opacity:0.5">📊</div>
-                    <h3 style="font-family:'Fraunces',serif;font-weight:600">Prévia da Apresentação</h3>
-                    <p style="color:var(--text-light);margin:16px 0;font-size:13.5px">A apresentação será gerada com: capa, diagnóstico, riscos identificados, programas de intervenção e plano de ação.</p>
+                    <h3 style="font-weight:600">Prévia da Apresentação</h3>
+                    <p style="color:var(--text-secondary);margin:16px 0;font-size:13.5px">A apresentação será gerada com: capa, diagnóstico, riscos identificados, programas de intervenção e plano de ação.</p>
                     <div id="presentation-preview"></div>
                 </div>
             </div>
@@ -555,7 +597,7 @@
             <div class="card">
                 <div class="card-header"><h2>Sobre o Sistema</h2></div>
                 <div class="card-body">
-                    <p style="font-size:13px;color:var(--text-light);line-height:1.7">
+                    <p style="font-size:13px;color:var(--text-secondary);line-height:1.7">
                         <strong>Sistema de Diagnóstico de Riscos Psicossociais — NR-1</strong><br>
                         Versão 2.0 — Conforme Portaria MTE nº 1.419/2024 e Guia MTE 2025<br>
                         Instrumento: 13 fatores de risco × 50 questões<br>
@@ -593,7 +635,7 @@
 <div class="modal-overlay" id="modal-calculate">
     <div class="modal">
         <h2>Confirmar Cálculo do Diagnóstico</h2>
-        <p style="margin-bottom:20px;color:var(--text-light)">Após calcular, as respostas serão processadas e o diagnóstico será gerado. Deseja prosseguir?</p>
+        <p style="margin-bottom:20px;color:var(--text-secondary)">Após calcular, as respostas serão processadas e o diagnóstico será gerado. Deseja prosseguir?</p>
         <div class="btn-group">
             <button class="btn btn-primary" onclick="calculateDiagnosis()">Calcular Diagnóstico</button>
             <button class="btn btn-secondary" onclick="closeModal('modal-calculate')">Cancelar</button>

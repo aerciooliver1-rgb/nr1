@@ -8,6 +8,9 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+Chart.defaults.color = '#888888';
+Chart.defaults.borderColor = '#252525';
+
 let currentUser = null;
 let currentCompanyId = null;
 let currentAssessmentId = null;
@@ -57,6 +60,11 @@ function esc(s) {
 }
 
 // ══ Auth ══
+function togglePasswordVisibility(btn) {
+    const input = btn.parentElement.querySelector('input');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
 function showSignup() {
     document.getElementById('login-form').classList.add('hidden');
     document.getElementById('signup-form').classList.remove('hidden');
@@ -178,7 +186,7 @@ async function loadDashboard() {
         document.getElementById('dashboard-companies').innerHTML = `
             <table><thead><tr><th>Empresa</th><th>Setor Econômico</th><th>Porte</th><th>Setores</th><th>Ações</th></tr></thead>
             <tbody>${companies.map(c => `<tr>
-                <td><strong>${esc(c.name)}</strong><br><small style="color:var(--text-light)">${esc(c.cnpj)}</small></td>
+                <td><strong>${esc(c.name)}</strong><br><small style="color:var(--text-secondary)">${esc(c.cnpj)}</small></td>
                 <td>${esc(c.setor_economico)||'-'}</td><td>${esc(c.porte)||'-'}</td><td>${(c.sectors||[]).length}</td>
                 <td><button class="btn btn-sm btn-secondary" onclick="viewCompany('${c.id}')">Ver perfil</button></td>
             </tr>`).join('')}</tbody></table>`;
@@ -511,7 +519,7 @@ async function loadRevisao() {
                     return `<tr><td style="font-size:13px">${q.question_code}: ${q.text}</td>
                     <td>${v?`<span class="badge badge-${v<=2?'baixo':v<=3?'moderado':'alto'}">${lb[v-1]}</span>`:'<span class="badge badge-alto">Pendente</span>'}</td></tr>`;
                 }).join('')}</tbody></table>
-                ${factorObservations[f.id]?`<div style="margin-top:12px;padding:12px;background:#F5F7FA;border-radius:8px"><strong>Obs:</strong> ${factorObservations[f.id]}</div>`:''}
+                ${factorObservations[f.id]?`<div style="margin-top:12px;padding:12px;background:var(--bg-elevated);border-radius:8px"><strong>Obs:</strong> ${factorObservations[f.id]}</div>`:''}
                 <button class="btn btn-sm btn-secondary mt-16" onclick="goToFactor(${factors.indexOf(f)});navigate('questionario')">Editar</button>
             </div></div>`;
     });
@@ -591,11 +599,11 @@ async function loadResultado() {
         document.getElementById('result-indicator').innerHTML = `
             <div class="risk-indicator ${lvl}"><div class="risk-score">${sc}</div>
             <div><div class="risk-label">${labels[lvl]}</div>
-            <div style="font-size:14px;color:var(--text-light)">Índice Geral — ${assessment.sectors?.name||''}</div></div></div>`;
+            <div style="font-size:14px;color:var(--text-secondary)">Índice Geral — ${assessment.sectors?.name||''}</div></div></div>`;
 
         if (riskChart) riskChart.destroy();
         const ctx = document.getElementById('risk-chart').getContext('2d');
-        const colors = (riskScores||[]).map(r => r.classification==='critico'?'#880E4F':r.classification==='alto'?'#F44336':r.classification==='moderado'?'#FF9800':'#4CAF50');
+        const colors = (riskScores||[]).map(r => r.classification==='critico'?'#C03060':r.classification==='alto'?'#E04848':r.classification==='moderado'?'#E8A020':'#34B89A');
 
         riskChart = new Chart(ctx, {
             type: 'bar',
@@ -652,7 +660,7 @@ async function loadIntervencoes() {
     document.getElementById('interventions-list').innerHTML = suggestions.map(({ rs, p }) => {
         const inc = existIds.has(p.id);
         return `<div class="program-card"><div class="flex-between"><h4>${p.name}</h4><span class="badge badge-${rs.classification}">${rs.classification}</span></div>
-            <p style="font-size:13px;color:var(--text-light);margin:8px 0">${p.objetivo||p.description||''}</p>
+            <p style="font-size:13px;color:var(--text-secondary);margin:8px 0">${p.objetivo||p.description||''}</p>
             <div class="meta"><span>Modalidade: ${p.modalidade||'-'}</span><span>Duração: ${p.duracao||'-'}</span><span>Público: ${p.publico_alvo||'-'}</span></div>
             <div style="margin-top:12px"><button class="btn btn-sm ${inc?'btn-secondary':'btn-primary'}" onclick="addIntervention('${rs.id}','${p.id}',this)" ${inc?'disabled':''}>${inc?'✓ Incluído':'+ Incluir'}</button></div></div>`;
     }).join('');
@@ -681,7 +689,7 @@ function renderCatalog(items) {
     document.getElementById('catalog-list').innerHTML = !items.length
         ? '<div class="empty-state"><p>Catálogo vazio</p></div>'
         : items.map(p => `<div class="program-card"><div class="flex-between"><h4>${p.name}</h4>${p.is_custom?'<span class="tag">Personalizado</span>':'<span class="tag">Padrão</span>'}</div>
-            <p style="font-size:13px;color:var(--text-light);margin:8px 0">${p.objetivo||p.description||''}</p>
+            <p style="font-size:13px;color:var(--text-secondary);margin:8px 0">${p.objetivo||p.description||''}</p>
             <div class="meta"><span>Modalidade: ${p.modalidade||'-'}</span><span>Duração: ${p.duracao||'-'}</span><span>Público: ${p.publico_alvo||'-'}</span></div></div>`).join('');
 }
 
@@ -764,7 +772,7 @@ async function loadApresentacao() {
     ]);
     document.getElementById('presentation-preview').innerHTML = `
         <div style="text-align:left;max-width:600px;margin:20px auto">
-            <div class="card" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:white;padding:32px;text-align:center;margin-bottom:16px">
+            <div class="card" style="background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:white;padding:32px;text-align:center;margin-bottom:16px">
                 <h2 style="font-size:20px">Diagnóstico de Riscos Psicossociais</h2>
                 <p style="opacity:0.8">${a.companies?.name||''} — ${a.sectors?.name||''}</p>
                 <p style="opacity:0.6;font-size:12px">NR-1 · Portaria MTE nº 1.419/2024</p></div>
@@ -773,7 +781,7 @@ async function loadApresentacao() {
             <div class="card"><div class="card-header"><h2>Fatores de Risco</h2></div><div class="card-body">
                 ${(risks||[]).map(rs => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
                     <span style="width:40px;font-weight:600">${rs.factors?.code}</span>
-                    <div class="risk-bar" style="flex:1;max-width:${rs.final_score}%;background:${rs.classification==='critico'?'#880E4F':rs.classification==='alto'?'#F44336':rs.classification==='moderado'?'#FF9800':'#4CAF50'}">${Math.round(rs.final_score)}</div>
+                    <div class="risk-bar" style="flex:1;max-width:${rs.final_score}%;background:${rs.classification==='critico'?'#C03060':rs.classification==='alto'?'#E04848':rs.classification==='moderado'?'#E8A020':'#34B89A'}">${Math.round(rs.final_score)}</div>
                     <span class="badge badge-${rs.classification}">${rs.classification}</span></div>`).join('')}
             </div></div></div>`;
 }
@@ -840,13 +848,13 @@ async function switchTrackingView(view, tabEl) {
                 ${cards.map(c => `<div class="kanban-card">
                     <div style="font-size:12px;margin-bottom:4px"><span class="badge badge-${c.priority}" style="font-size:10px">${c.priority}</span></div>
                     <div>${esc((c.description||'').substring(0,80))}${c.description?.length>80?'...':''}</div>
-                    <div style="font-size:11px;color:var(--text-light);margin-top:8px">${esc(c.responsible_name)||'Sem responsável'} · ${c.due_date?fmtDate(c.due_date):'Sem prazo'}</div>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-top:8px">${esc(c.responsible_name)||'Sem responsável'} · ${c.due_date?fmtDate(c.due_date):'Sem prazo'}</div>
                     <select onchange="updItemStatusDirect('${c.id}',this.value);loadAcompanhamento()" style="margin-top:8px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:11px;width:100%">
                         <option value="pendente" ${c.status==='pendente'?'selected':''}>Pendente</option>
                         <option value="em_andamento" ${c.status==='em_andamento'?'selected':''}>Em andamento</option>
                         <option value="concluida" ${c.status==='concluida'?'selected':''}>Concluída</option>
                         <option value="atrasada" ${c.status==='atrasada'?'selected':''}>Atrasada</option></select>
-                </div>`).join('')||'<p style="font-size:12px;color:var(--text-light)">Vazio</p>'}
+                </div>`).join('')||'<p style="font-size:12px;color:var(--text-secondary)">Vazio</p>'}
             </div>`).join('')}</div>`;
     } else {
         document.getElementById('tracking-content').innerHTML = `<div class="card"><div class="card-body table-container">
@@ -941,7 +949,7 @@ async function loadReavComparativo() {
             tableHtml += `<td><span class="badge badge-${cls}">${sc}</span></td>`;
             if (r && prev !== null) {
                 const diff = Math.round(r.final_score) - prev;
-                trend = diff > 0 ? `<span style="color:var(--risk-alto)">▲ +${diff}</span>` : diff < 0 ? `<span style="color:var(--primary)">▼ ${diff}</span>` : '<span style="color:var(--text-light)">—</span>';
+                trend = diff > 0 ? `<span style="color:var(--risk-alto)">▲ +${diff}</span>` : diff < 0 ? `<span style="color:var(--accent)">▼ ${diff}</span>` : '<span style="color:var(--text-secondary)">—</span>';
             }
             if (r) prev = Math.round(r.final_score);
         }
@@ -952,9 +960,9 @@ async function loadReavComparativo() {
     const penult = assessments[assessments.length - 2];
     const diff = Math.round((last.indice_risco_geral||0) - (penult.indice_risco_geral||0));
     const trendIcon = diff > 0 ? '▲' : diff < 0 ? '▼' : '—';
-    const trendColor = diff > 0 ? 'var(--risk-alto)' : diff < 0 ? 'var(--primary)' : 'var(--text-light)';
+    const trendColor = diff > 0 ? 'var(--risk-alto)' : diff < 0 ? 'var(--risk-baixo)' : 'var(--text-muted)';
 
-    tableHtml += `<tr style="font-weight:600;background:#F5F7FA"><td>GERAL</td>${assessments.map(a => `<td><span class="badge badge-${a.nivel_risco_geral}">${Math.round(a.indice_risco_geral||0)}</span></td>`).join('')}<td><span style="color:${trendColor}">${trendIcon} ${diff > 0 ? '+' : ''}${diff}</span></td></tr>`;
+    tableHtml += `<tr style="font-weight:600;background:var(--bg-elevated)"><td>GERAL</td>${assessments.map(a => `<td><span class="badge badge-${a.nivel_risco_geral}">${Math.round(a.indice_risco_geral||0)}</span></td>`).join('')}<td><span style="color:${trendColor}">${trendIcon} ${diff > 0 ? '+' : ''}${diff}</span></td></tr>`;
     tableHtml += '</tbody></table>';
 
     document.getElementById('reav-resultado').innerHTML = `
@@ -993,10 +1001,10 @@ async function generateReport() {
     el.innerHTML = `<div class="card" style="margin-top:20px"><div class="card-header"><h2>Relatório de Diagnóstico</h2></div>
         <div class="card-body" id="report-print-area">
             <div style="text-align:center;margin-bottom:24px">
-                <h2 style="color:var(--primary-dark)">Diagnóstico de Riscos Psicossociais — NR-1</h2>
+                <h2 style="color:var(--accent-dark)">Diagnóstico de Riscos Psicossociais — NR-1</h2>
                 <p style="font-size:16px">${a.companies?.name||''}</p>
-                <p style="color:var(--text-light)">Setor: ${a.sectors?.name||''} · Ciclo ${a.cycle_number} · ${fmtDate(a.completed_at)}</p>
-                <p style="color:var(--text-light)">CNPJ: ${a.companies?.cnpj||'-'}</p></div>
+                <p style="color:var(--text-secondary)">Setor: ${a.sectors?.name||''} · Ciclo ${a.cycle_number} · ${fmtDate(a.completed_at)}</p>
+                <p style="color:var(--text-secondary)">CNPJ: ${a.companies?.cnpj||'-'}</p></div>
             <div class="risk-indicator ${a.nivel_risco_geral}" style="justify-content:center">
                 <div class="risk-score">${Math.round(a.indice_risco_geral||0)}</div>
                 <div><div class="risk-label">Risco ${a.nivel_risco_geral}</div></div></div>
@@ -1006,7 +1014,7 @@ async function generateReport() {
                 <td>${Math.round(rs.final_score)}</td><td><span class="badge badge-${rs.classification}">${rs.classification}</span></td>
                 <td style="font-size:12px">${rs.factors?.consequence||''}</td></tr>`).join('')}</tbody></table>
             ${(obs||[]).length?`<h3 style="margin:20px 0 12px">Observações Clínicas</h3>${obs.map(o => `<div style="margin-bottom:8px"><strong>${o.factors?.code}:</strong> ${o.observation}</div>`).join('')}`:''}
-            <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-light)">
+            <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-secondary)">
                 <p>NR-1 cap. 1.5 — Portaria MTE nº 1.419/2024 · Guia MTE 2025</p>
                 <p>Ciclo de reavaliação: 6–12 meses (NR-1 subitem 1.5.4.4.6)</p></div>
         </div></div>
