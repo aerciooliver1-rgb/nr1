@@ -49,6 +49,13 @@ function formatCNPJ(v) {
         .replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d)/, '$1-$2').substring(0, 18);
 }
 
+function esc(s) {
+    if (!s) return '';
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
 // ══ Auth ══
 function showSignup() {
     document.getElementById('login-form').classList.add('hidden');
@@ -129,6 +136,7 @@ function navigate(screen) {
     document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
     const nav = document.querySelector(`.sidebar-nav a[data-screen="${screen}"]`);
     if (nav) nav.classList.add('active');
+    document.getElementById('sidebar')?.classList.remove('open');
 
     const loaders = {
         dashboard: loadDashboard, empresas: loadEmpresas, 'empresa-form': loadEmpresaForm,
@@ -170,8 +178,8 @@ async function loadDashboard() {
         document.getElementById('dashboard-companies').innerHTML = `
             <table><thead><tr><th>Empresa</th><th>Setor Econômico</th><th>Porte</th><th>Setores</th><th>Ações</th></tr></thead>
             <tbody>${companies.map(c => `<tr>
-                <td><strong>${c.name}</strong><br><small style="color:var(--text-light)">${c.cnpj||''}</small></td>
-                <td>${c.setor_economico||'-'}</td><td>${c.porte||'-'}</td><td>${(c.sectors||[]).length}</td>
+                <td><strong>${esc(c.name)}</strong><br><small style="color:var(--text-light)">${esc(c.cnpj)}</small></td>
+                <td>${esc(c.setor_economico)||'-'}</td><td>${esc(c.porte)||'-'}</td><td>${(c.sectors||[]).length}</td>
                 <td><button class="btn btn-sm btn-secondary" onclick="viewCompany('${c.id}')">Ver perfil</button></td>
             </tr>`).join('')}</tbody></table>`;
     } catch (e) { toast(e.message, 'error'); }
@@ -227,7 +235,7 @@ async function loadEmpresas() {
     }
     document.getElementById('empresas-list').innerHTML = `
         <table><thead><tr><th>Empresa</th><th>CNPJ</th><th>Setor</th><th>Porte</th><th>Grau NR-4</th><th></th></tr></thead>
-        <tbody>${data.map(c => `<tr><td><strong>${c.name}</strong></td><td>${c.cnpj||'-'}</td><td>${c.setor_economico||'-'}</td><td>${c.porte||'-'}</td><td>${c.grau_risco_nr4||'-'}</td><td><button class="btn btn-sm btn-secondary" onclick="viewCompany('${c.id}')">Ver</button></td></tr>`).join('')}</tbody></table>`;
+        <tbody>${data.map(c => `<tr><td><strong>${esc(c.name)}</strong></td><td>${esc(c.cnpj)||'-'}</td><td>${esc(c.setor_economico)||'-'}</td><td>${esc(c.porte)||'-'}</td><td>${c.grau_risco_nr4||'-'}</td><td><button class="btn btn-sm btn-secondary" onclick="viewCompany('${c.id}')">Ver</button></td></tr>`).join('')}</tbody></table>`;
 }
 
 function viewCompany(id) { currentCompanyId = id; navigate('empresa-perfil'); }
@@ -241,7 +249,7 @@ async function loadEmpresaPerfil() {
             sb.from('sectors').select('*').eq('company_id', currentCompanyId).order('created_at'),
             sb.from('assessments').select('*, sectors(name)').eq('company_id', currentCompanyId).order('created_at', { ascending: false }),
         ]);
-        document.getElementById('perfil-empresa-name').textContent = company.name;
+        document.getElementById('perfil-empresa-name').textContent = company.name || '';
         const tw = (sectors||[]).reduce((s, sec) => s + (sec.num_trabalhadores || 0), 0);
         const cd = (assessments||[]).filter(a => a.status === 'completed').length;
         const ac = (assessments||[]).filter(a => ['in_progress','coletando','review'].includes(a.status)).length;
@@ -342,20 +350,19 @@ async function createAssessment() {
     };
 
     const { data, error } = await sb.from('assessments').insert(rec).select().single();
-    if (error) { toast(error.message, 'error'); return; }
+    if (error) { toast(error.message, 'error'); setLoading(btn, false); return; }
 
     currentAssessmentId = data.id;
     currentCompanyId = company_id;
+    setLoading(btn, false);
 
     if (mode === 'anonimo') {
         const link = `/survey/${data.id}/${sector_id}/${token_convite}`;
         await sb.from('assessments').update({ link_survey: link }).eq('id', data.id);
         alert(`Link do survey anônimo:\n${window.location.origin}${link}\n\nCompartilhe com os trabalhadores do setor.`);
-        setLoading(btn, false);
         navigate('empresa-perfil');
     } else {
         toast('Avaliação criada!');
-        setLoading(btn, false);
         navigate('questionario');
     }
 }
@@ -470,6 +477,20 @@ async function prevFactor() {
 // ══ T-08: Review ══
 async function loadRevisao() {
     if (!currentAssessmentId) return;
+    if (!factors.length) {
+        const [{ data: f }, { data: q }] = await Promise.all([
+            sb.from('factors').select('*').order('order_index'),
+            sb.from('questions').select('*').order('factor_id').order('order_index'),
+        ]);
+        factors = f || [];
+        questions = q || [];
+    }
+    if (!Object.keys(assessmentResponses).length) {
+        const { data: existing } = await sb.from('assessment_responses').select('question_id, score').eq('assessment_id', currentAssessmentId);
+        (existing||[]).forEach(r => { assessmentResponses[r.question_id] = r.score; });
+        const { data: obs } = await sb.from('factor_observations').select('factor_id, observation').eq('assessment_id', currentAssessmentId);
+        (obs||[]).forEach(o => { factorObservations[o.factor_id] = o.observation; });
+    }
     let missing = 0;
     let html = '';
     factors.forEach(f => {
@@ -816,10 +837,15 @@ async function switchTrackingView(view, tabEl) {
         document.getElementById('tracking-content').innerHTML = `<div class="kanban-board">
             ${Object.entries(g).map(([s, cards]) => `<div class="kanban-column">
                 <h3><span class="badge badge-${s}">${fmtStatus(s)}</span> (${cards.length})</h3>
-                ${cards.map(c => `<div class="kanban-card" onclick="updItemStatus('${c.id}')">
+                ${cards.map(c => `<div class="kanban-card">
                     <div style="font-size:12px;margin-bottom:4px"><span class="badge badge-${c.priority}" style="font-size:10px">${c.priority}</span></div>
-                    <div>${(c.description||'').substring(0,80)}${c.description?.length>80?'...':''}</div>
-                    <div style="font-size:11px;color:var(--text-light);margin-top:8px">${c.responsible_name||'Sem responsável'} · ${c.due_date?fmtDate(c.due_date):'Sem prazo'}</div>
+                    <div>${esc((c.description||'').substring(0,80))}${c.description?.length>80?'...':''}</div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:8px">${esc(c.responsible_name)||'Sem responsável'} · ${c.due_date?fmtDate(c.due_date):'Sem prazo'}</div>
+                    <select onchange="updItemStatusDirect('${c.id}',this.value);loadAcompanhamento()" style="margin-top:8px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:11px;width:100%">
+                        <option value="pendente" ${c.status==='pendente'?'selected':''}>Pendente</option>
+                        <option value="em_andamento" ${c.status==='em_andamento'?'selected':''}>Em andamento</option>
+                        <option value="concluida" ${c.status==='concluida'?'selected':''}>Concluída</option>
+                        <option value="atrasada" ${c.status==='atrasada'?'selected':''}>Atrasada</option></select>
                 </div>`).join('')||'<p style="font-size:12px;color:var(--text-light)">Vazio</p>'}
             </div>`).join('')}</div>`;
     } else {
@@ -1003,11 +1029,12 @@ async function loadAvaliacoes() {
 }
 
 async function saveConfig() {
-    const name = document.getElementById('config-name').value;
-    const crp = document.getElementById('config-crp').value;
+    const name = document.getElementById('config-name').value.trim();
+    const crp = document.getElementById('config-crp').value.trim();
+    if (!name) { toast('Nome é obrigatório', 'error'); return; }
     try {
         const { error } = await sb.from('profiles').upsert({
-            id: currentUser.id, full_name: name || null, crp: crp || null
+            id: currentUser.id, full_name: name, crp: crp || null
         });
         if (error) throw error;
         toast('Configurações salvas!');
