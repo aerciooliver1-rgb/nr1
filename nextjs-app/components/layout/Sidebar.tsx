@@ -113,7 +113,7 @@ const navSections = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
 
   return (
     <aside className="sidebar">
@@ -141,7 +141,7 @@ export function Sidebar() {
       </nav>
 
       <div className="sidebar-user">
-        <div className="user-email">{user?.email || ''}</div>
+        <div className="user-email">{currentUser?.email || ''}</div>
         <button className="btn-logout" onClick={logout}>
           Sair
         </button>

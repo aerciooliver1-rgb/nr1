@@ -1,3 +1,17 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #0B0B0B;
+  --color-foreground: #F0F0F0;
+  --color-amber-accent: #E8A020;
+  --color-amber-hover: #F0B040;
+  --color-amber-muted: #92400e;
+  --color-surface: #111111;
+  --color-surface-hover: #1C1C1C;
+  --color-border: #252525;
+  --font-sans: var(--font-sora);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    DRPS NR-1 — Dark Professional Design System
    Font: Sora (geometric sans)
