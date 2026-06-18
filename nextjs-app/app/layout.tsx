@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className={`${sora.variable} h-full antialiased dark`}>
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+    <html lang="pt-BR" className={sora.variable}>
+      <body>
         <AuthProvider>
           <ToastProvider>{children}</ToastProvider>
         </AuthProvider>

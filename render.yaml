@@ -1,9 +1,14 @@
 services:
   - type: web
     name: drps-nr1
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    runtime: node
+    rootDir: nextjs-app
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.11"
+      - key: NODE_VERSION
+        value: "20"
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false

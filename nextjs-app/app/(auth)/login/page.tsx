@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import PasswordInput from '@/components/forms/PasswordInput'
+import { PasswordInput } from '@/components/forms/PasswordInput'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -64,7 +64,7 @@ export default function LoginPage() {
     }
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       handleSubmit()
     }

@@ -18,8 +18,8 @@ export default function Home() {
   }, [currentUser, loading, router])
 
   return (
-    <div className="flex flex-1 items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-amber-accent border-t-transparent" />
+    <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <div className="spinner" />
     </div>
   )
 }

@@ -3,13 +3,14 @@
 import React, { useState } from 'react';
 
 interface PasswordInputProps {
-  id: string;
+  id?: string;
   placeholder?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
-export function PasswordInput({ id, placeholder, value, onChange }: PasswordInputProps) {
+export function PasswordInput({ id, placeholder, value, onChange, onKeyDown }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -20,6 +21,7 @@ export function PasswordInput({ id, placeholder, value, onChange }: PasswordInpu
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
       />
       <button
         type="button"
